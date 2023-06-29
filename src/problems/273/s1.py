@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 
 class Solution:
@@ -25,17 +25,17 @@ def numberToWordsParsed(b: int, m: int, t: int, f: int, acc: list[str]):
             if t == 0:
                 under1000ToWords(f, acc)
             else:
-                res = under1000ToWords(t, acc)
+                under1000ToWords(t, acc)
                 acc.append(thousand)
-                res2 = under1000ToWords(f, acc)
+                under1000ToWords(f, acc)
         else:
-            res = under1000ToWords(m, acc)
+            under1000ToWords(m, acc)
             acc.append(million)
-            res2 = numberToWordsParsed(0, 0, t, f, acc)
+            numberToWordsParsed(0, 0, t, f, acc)
     else:
-        res = under1000ToWords(b, acc)
+        under1000ToWords(b, acc)
         acc.append(billion)
-        res2 = numberToWordsParsed(0, m, t, f, acc)
+        numberToWordsParsed(0, m, t, f, acc)
 
 
 ut = [
@@ -96,11 +96,10 @@ def under1000ToWords(num: int, acc: List[str]):
 def under1000ToWordsParsed(h: int, t: int, f: int, acc: List[str]):
     if h == 0:
         if t == 0:
-            if f == 0:
-                return
-            return acc.append(ut[f])
+            if f != 0:
+                acc.append(ut[f])
         elif t == 1:
-            return acc.append(utwenty[f])
+            acc.append(utwenty[f])
         else:
             acc.append(uh[t])
             under1000ToWordsParsed(0, 0, f, acc)
