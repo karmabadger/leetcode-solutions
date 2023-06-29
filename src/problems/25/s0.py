@@ -36,68 +36,73 @@ def list_node_to_list(l: Optional[ListNode]) -> List[int]:
 
 class Solution:
     def reverseKGroup(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
-        if head == None:
-            return None
-
-        if k == 1:
+        if head == None or k == 1:
             return head
 
-        # count number of nodes
-        count = 0
-        next = head
-        while next != None:
-            next = next.next
-            count += 1
-
+        count = count_nodes(head)
         if count < k:
             return head
 
         div_k = count // k
+        gfirst = head
+        (glast, next) = reverse_k(gfirst, k)
+        first = glast
+        prev_gfirst = gfirst
 
-        prev = None
-        cur = head
-        next = cast(ListNode | None, cur.next)
-        cur.next = None
-        if next == None:
-            return cur
+        if div_k > 1:
+            for i in range(1, div_k):
+                gfirst = next
+                (glast, next) = reverse_k(gfirst, k)
+                prev_gfirst.next = glast
+                prev_gfirst = gfirst
 
-        first_first = None
-        last_last = None
-        last = None
-        for i in range(0, div_k):
-            last_last = last
-            last = cur
-            for j in range(1, k):
-                prev = cur
-                cur = next
-                next = cast(ListNode, cur.next)
-                cur.next = prev
+            gfirst.next = next
+        else:
+            gfirst.next = next
 
-            if i == 0:
-                first_first = cur
+        return first
 
-            first = cur
-            if last_last != None:
-                last_last.next = first
 
-            last.next = next
-            cur = next
-            next = cast(ListNode, cur.next)
+def count_nodes(head: Optional[ListNode]) -> int:
+    # count number of nodes
+    count = 0
+    next = head
+    while next != None:
+        next = next.next
+        count += 1
 
-        return first_first
+    return count
+
+
+def reverse_k(start: ListNode, k: int) -> Tuple[ListNode, ListNode]:
+    # reverses and returns the last node and the one after or None
+    prev = None
+    cur = start
+    next = cast(ListNode, cur.next)
+    for i in range(k - 1):
+        cur.next = prev
+        prev = cur
+        cur = next
+        next = cast(ListNode, cur.next)
+
+    cur.next = prev
+    prev = cur
+    cur = next
+
+    return (prev, cur)
 
 
 def main():
-    # print(
-    #     list_node_to_list(
-    #         Solution().reverseKGroup(list_to_list_node([1, 2, 3, 4, 5]), 2)
-    #     )
-    # )
-    # print(
-    #     list_node_to_list(
-    #         Solution().reverseKGroup(list_to_list_node([1, 2, 3, 4, 5]), 3)
-    #     )
-    # )
+    print(
+        list_node_to_list(
+            Solution().reverseKGroup(list_to_list_node([1, 2, 3, 4, 5]), 2)
+        )
+    )
+    print(
+        list_node_to_list(
+            Solution().reverseKGroup(list_to_list_node([1, 2, 3, 4, 5]), 3)
+        )
+    )
     print(list_node_to_list(Solution().reverseKGroup(list_to_list_node([1, 2]), 2)))
 
 
