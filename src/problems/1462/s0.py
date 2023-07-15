@@ -18,79 +18,41 @@ class Solution:
             else:
                 childrenb.append(a)
 
-        p2d = [[False for j in range(numCourses)] for k in range(numCourses)]
+        reachable = [[False] * numCourses for k in range(numCourses)]
         for i, count in enumerate(deps_count):
             if count == 0:
-                prereq(i, children, deps_count, set(), p2d)
+                reachable_color(i, children, [], reachable)
 
-        res = [False] * len(queries)
-        for i, query in enumerate(queries):
-            if p2d[query[1]][query[0]]:
-                res[i] = True
-
-        return res
+        return [reachable[q2][q1] for q1, q2 in queries]
 
 
-def prereq(
+def reachable_color(
     c: int,
     children: List[List[int] | None],
-    deps_count: List[int],
-    cur_pre: set[int],
-    p2d: List[List[bool]],
+    stack: List[int],
+    reachable: list[list[bool]],
 ):
-    children_c = children[c]
-    if children_c != None:
-        cur_pre.add(c)
-        for child in children_c:
-            for item in cur_pre:
-                p2d[child][item] = True
+    all_done = True
+    reachable_c = reachable[c]
+    for parent in stack:
+        if not reachable_c[parent]:
+            all_done = False
+            reachable_c[parent] = True
 
-            deps_count[child] -= 1
-            # if deps_count[child] == 0:
-                
-            prereq(child, children, deps_count, cur_pre, p2d)
-        cur_pre.remove(c)
-    return p2d
+    if len(stack) == 0 or not all_done:
+        children_c = children[c]
+        if children_c != None:
+            stack.append(c)
+            for child in children_c:
+                reachable_color(child, children, stack, reachable)
+            stack.pop()
 
 
-#
-#
-#
 inputs = [
-    # (2, [[1, 0]], [[0, 1], [1, 0]]),
-    # (2, [], [[1, 0], [0, 1]]),
-    # (5, [[0, 1], [1, 2], [2, 3], [3, 4]], [[0, 4], [4, 0], [1, 3], [3, 0]]),
-    (
-        10,
-        [
-            # [3, 9],
-            # [3, 2],
-            # [3, 7],
-            [9, 5],
-            # [9, 0],
-            # [9, 6],
-            [8, 0],
-            # [8, 1],
-            # [8, 7],
-            [5, 0],
-            # [5, 2],
-            # [5, 1],
-            # [5, 7],
-            # [5, 6],
-            [0, 2],
-            # [0, 1],
-            # [0, 6],
-            # [2, 1],
-            # [2, 6],
-            # [4, 1],
-            # [1, 7],
-            # [1, 6],
-            # [7, 6],
-        ],
-        [
-            [8, 2],
-        ],
-    ),
+    (2, [[1, 0]], [[0, 1], [1, 0]]),
+    (2, [], [[1, 0], [0, 1]]),
+    (3, [[1, 2], [1, 0], [2, 0]], [[1, 0], [1, 2]]),
+    (5, [[0, 1], [1, 2], [2, 3], [3, 4]], [[0, 4], [4, 0], [1, 3], [3, 0]]),
 ]
 
 for input in inputs:
